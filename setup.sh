@@ -13,9 +13,7 @@ mkdir -p ${COLORS_WORKFLOW_SINGULARITY}
 mkdir -p ${COLORS_WORKFLOW_RESOURCES}
 
 echo $(date) - Downloading sif files to singularity subfolder..
-#curl -o ${COLORS_WORKFLOW_SINGULARITY}/pbsv_2.9.0.sif https://depot.galaxyproject.org/singularity/pbsv%3A2.9.0--h9ee0642_0 -C -
 curl -o ${COLORS_WORKFLOW_SINGULARITY}/jasminesv_1.1.5.sif https://depot.galaxyproject.org/singularity/jasminesv%3A1.1.5--hdfd78af_0 -C -
-#curl -o ${COLORS_WORKFLOW_SINGULARITY}/truvari_5.2.0.sif https://depot.galaxyproject.org/singularity/truvari%3A5.2.0--pyhdfd78af_0 -C -
 curl -o ${COLORS_WORKFLOW_SINGULARITY}/bcftools_1.19.sif https://depot.galaxyproject.org/singularity/bcftools%3A1.19--h8b25389_1 -C -
 echo $(date) - End of download.
 
