@@ -78,7 +78,7 @@ echo "Minimum SV Length = ${MIN_SV_LENGTH}"
 echo "Starting variant count: " $(zcat ${INPUTFILE} | grep -v '^#' | wc -l)
 
 echo '==' $(date) '==' Preprocess input VCF to filter for PASS and chr1-22,X,Y,M variants
-${BCFTOOLSCMD} bcftools view -f PASS -i "INFO/SVLEN>${MIN_SV_LENGTH} || INFO/SVLEN<-${MIN_SV_LENGTH}" \
+${BCFTOOLSCMD} bcftools view -f PASS -i "INFO/SVLEN>=${MIN_SV_LENGTH} || INFO/SVLEN<=-${MIN_SV_LENGTH}" \
 -r chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY,chrM \
 -Oz -o ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz ${INPUTFILE}
 ${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz
