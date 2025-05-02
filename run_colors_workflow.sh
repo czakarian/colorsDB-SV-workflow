@@ -12,6 +12,7 @@ usage() {
     echo
     echo "Optional arguments:"
     echo "  -t <threads>          Number of threads to use (default: 4)."
+    echo "  -m <min_sv_length>    Filter out SVs smaller than set threshold. (default: 15)."
 
 }
 
@@ -23,12 +24,14 @@ fi
 
 # Default values
 export THREADS=4  
+export MIN_SV_LENGTH=15
 
-while getopts "i:o:t:h" FLAG; do
+while getopts "i:o:t:m:h" FLAG; do
     case ${FLAG} in
         i) INPUTFILE=${OPTARG};;
         o) OUTDIR=${OPTARG};;
         t) THREADS=${OPTARG};;
+        m) MIN_SV_LENGTH=${OPTARG};;
         h) 
             usage
             exit 0
@@ -42,7 +45,6 @@ while getopts "i:o:t:h" FLAG; do
 done
 
 ### modifiable variables
-export MIN_SV_LENGTH=15
 export OVERSIZED_THRESHOLD=100000
 export UW1KG_STRICTNESS="relaxed" ## strict or relaxed
 ###
@@ -79,7 +81,7 @@ echo "Threads = ${THREADS}"
 echo "Starting variant count: " $(zcat ${INPUTFILE} | grep -v '^#' | wc -l)
 
 echo '==' $(date) '==' Preprocess input VCF to filter for PASS and chr1-22,X,Y,M variants
-${BCFTOOLSCMD} bcftools view -f PASS \
+${BCFTOOLSCMD} bcftools view -f PASS -i "INFO/SVLEN>${MIN_SV_LENGTH} || INFO/SVLEN<-${MIN_SV_LENGTH}" \
 -r chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY,chrM \
 -Oz -o ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz ${INPUTFILE}
 ${BCFTOOLSCMD} bcftools index --threads ${THREADS} --tbi ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz
