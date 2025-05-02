@@ -3,7 +3,7 @@
 """This script takes the output vcfs from truvari bench between a sample vcf and either the 1000g ONT merged VCF or the Colors SV merged VCF and appends the AF annotations to
 the appropriate variant records that had a match in the merge using MatchIDs. It will add empty annotations for variants without a match."""
 
-#1. parse tp-base to get MatchID per record as key and AC/AF/etc annotations as value
+#1 parse tp-base to get MatchID per record as key and AC/AF/etc annotations as value
 #2 parse tp-comp, identify MatchID in #1 dict and append to INFO field + header should be written here as well
 #3 parse fp, append empty INFO fields
 
@@ -54,12 +54,12 @@ fw = open(args.output_vcf, 'wt')
 
 variant_dict = {}
 header_lines = []
-## there is also END (inc in header but not pulled per record)
 
+## there is also END (inc in header but not pulled per record)
 if args.reference_db == 'COLORS':
     info_fields_to_keep= ['SVTYPE', 'SVLEN', 'AC', 'AN', 'NS', 'AF', 'AC_Het', 'AC_Hom', 'AC_Hemi', 'HWE', 'ExcHet', 'nhomalt']
 elif args.reference_db == 'UW1KG':
-    info_fields_to_keep= ['SVTYPE', 'SVLEN', 'Allele_Freq_ALL', 'Pop_Count_ALL', 'OMIM', 'Exonic', 'Centromeric', 'Pericentromeric', 'Telomeric', 'STR', 'VNTR', 'Segdup', 'Repeat', 'Gap', 'HiConf']
+    info_fields_to_keep= ['SVTYPE', 'SVLEN', 'Allele_Freq_ALL', 'Pop_Count_ALL', 'Pop_Freq_ALL', 'OMIM', 'Exonic', 'Centromeric', 'Pericentromeric', 'Telomeric', 'STR', 'VNTR', 'Segdup', 'Repeat', 'Gap', 'HiConf']
 else:
     exit("Value given to argument --reference_db was invalid. Should be either COLORS or UW1KG")
 
@@ -113,11 +113,10 @@ with gzip.open(tp_comp_file, 'rt') as fr:
             updated_row = '\t'.join(fields)
             fw.write(updated_row + '\n')
 
-## should I add field that says colors_db_match=True, 1000G_match=True? or do this method of empty fields
 if args.reference_db == 'COLORS':
     no_match_string="COLORS_AC=0;COLORS_AN=0;COLORS_NS=0;COLORS_AF=0;COLORS_AC_Het=0;COLORS_AC_Hom=0;COLORS_AC_Hemi=0;COLORS_HWE=0;COLORS_ExcHet=0;COLORS_nhomalt=0"
 elif args.reference_db == 'UW1KG':
-    no_match_string="UW1KG_Allele_Freq_ALL=0;UW1KG_Pop_Count_ALL=0"
+    no_match_string="UW1KG_Allele_Freq_ALL=0;UW1KG_Pop_Count_ALL=0;UW1KG_Pop_Freq_ALL=0"
 
 with gzip.open(fp_file, 'rt') as fr:
     for line in fr:

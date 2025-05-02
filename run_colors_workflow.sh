@@ -43,7 +43,7 @@ done
 
 ### modifiable variables
 export OVERSIZED_THRESHOLD=100000
-export UW1KG_STRICTNESS="relaxed" ## strict or relaxed VCF
+export UW1KG_STRICTNESS="strict" ## strict or relaxed VCF
 ###
 
 export COLORS_WORKFLOW_ROOT="$(dirname "$(readlink -f "${BASH_SOURCE}")")"
@@ -51,12 +51,11 @@ export COLORS_WORKFLOW_RESOURCES="${COLORS_WORKFLOW_ROOT}/resources"
 export COLORS_WORKFLOW_SINGULARITY="${COLORS_WORKFLOW_ROOT}/singularity"
 
 export REF="${COLORS_WORKFLOW_RESOURCES}/GRCh38_no_alt_analysis_set.fasta"
-export COLORSDBVCF="${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.fixed_format.vcf.gz"
-export UWONTVCF="${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_${UW1KG_STRICTNESS}.fixed_format.vcf.gz"
+export COLORSDBVCF="${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.setid.vcf.gz"
+export UWONTVCF="${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_${UW1KG_STRICTNESS}.setid.vcf.gz"
 
 export BCFTOOLSCMD="${COLORS_WORKFLOW_SINGULARITY}/bcftools_1.19.sif"
 export TRUVARICMD="${COLORS_WORKFLOW_SINGULARITY}/truvari_5.3.0.sif"
-export HTSLIBCMD="${COLORS_WORKFLOW_SINGULARITY}/htslib_1.19.sif"
 
 OUTDIR="${OUTDIR%/}"
 [ ! -d "${OUTDIR}" ] && mkdir "${OUTDIR}"
@@ -80,13 +79,13 @@ echo "Starting variant count: " $(zcat ${INPUTFILE} | grep -v '^#' | wc -l)
 echo '==' $(date) '==' Preprocess input VCF to filter for PASS and chr1-22,X,Y,M variants
 ${BCFTOOLSCMD} bcftools view -f PASS -i "INFO/SVLEN>=${MIN_SV_LENGTH} || INFO/SVLEN<=-${MIN_SV_LENGTH}" \
 -r chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY,chrM \
--Oz -o ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz ${INPUTFILE}
-${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz
+-Oz -o ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz ${INPUTFILE}
+${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz
 
-echo "Remaining variant count: " $(zcat ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz | grep -v '^#' | wc -l)
+echo "Remaining variant count: " $(zcat ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz | grep -v '^#' | wc -l)
 
 echo '==' $(date) '==' Truvari bench with ColorsDB 
-${TRUVARICMD} truvari bench -b ${COLORSDBVCF} -c ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_colors \
+${TRUVARICMD} truvari bench -b ${COLORSDBVCF} -c ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_colors \
 --sizemin ${MIN_SV_LENGTH} --sizemax ${OVERSIZED_THRESHOLD} --dup-to-ins --write-resolved --refdist 500 --pctseq 0.90 --pctsize 0.90
 
 echo '==' $(date) '==' Append ColorsDB annotations 
@@ -118,7 +117,7 @@ echo "Remaining variant count: " $(zcat ${OUTDIR}/debug/${PREFIX}.colorAnno.1000
 echo '==' $(date) '==' Oversized SV iteration - Run truvari merge + annotate steps for oversized SVs filtered during first iteration of workflow
 echo '==' $(date) '==' "Pull oversized SVs from preprocessed VCF (SVLEN>${OVERSIZED_THRESHOLD})"
 ${BCFTOOLSCMD} bcftools view -i "(INFO/SVLEN > ${OVERSIZED_THRESHOLD} || INFO/SVLEN < -${OVERSIZED_THRESHOLD})" \
--Oz -o ${OUTDIR}/debug/${PREFIX}.oversizedSVs.vcf.gz ${OUTDIR}/${PREFIX}.preprocessed.vcf.gz
+-Oz -o ${OUTDIR}/debug/${PREFIX}.oversizedSVs.vcf.gz ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz
 ${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/debug/${PREFIX}.oversizedSVs.vcf.gz
 
 echo "Oversized SV count: " $(zcat ${OUTDIR}/debug/${PREFIX}.oversizedSVs.vcf.gz | grep -v '^#' | wc -l)
