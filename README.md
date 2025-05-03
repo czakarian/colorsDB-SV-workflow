@@ -25,17 +25,14 @@ Usage: run_colors_workflow.sh -i <input_vcf> -o <output_dir> [-m <min_sv_length>
 
 Required arguments:
   -i <input_vcf>         Input VCF (should be .gz and have .tbi index).
-  -o <output_dir>        Output directory.
-
-Optional arguments:
-  -m <min_sv_length>    Filter out SVs smaller than set threshold. (default: 15).
+  -o <output_dir>        Output directory for final vcf and temp files.
 ```
 
 `./run_colors_workflow.sh -i input.vcf -o example_dir`
 
 ## Added INFO fields
 
-The final vcf will generated in the given output directory and named as `{SAMPLE}.colorAnno.1000gAnno.final.vcf.gz`. Intermediate files will be stored in a directory named `debug`.
+The final vcf will be named `{SAMPLE}.colorAnno.1000gAnno.final.vcf.gz`. Intermediate files will be stored in a directory named `debug`.
 
 Annotations will be added as new INFO fields -- those from the colorsDB dataset will be prepended with `COLORS_` and those from the 1000G ONT dataset will be prepended with `UW1KG_`. SVs that were not detected in either population dataset will be annotated with empty INFO fields (ex. COLORS_AF=0, COLORS_AC=0, UW1KG_Pop_Count_ALL=0, etc).
 

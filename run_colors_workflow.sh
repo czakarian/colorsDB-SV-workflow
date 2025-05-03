@@ -4,14 +4,11 @@ set -eu -o pipefail
 
 
 usage() {
-    echo "Usage: run_colors_workflow.sh -i <input_vcf> -o <output_dir> [-m <min_sv_length>]"
+    echo "Usage: run_colors_workflow.sh -i <input_vcf> -o <output_dir>"
     echo
     echo "Required arguments:"
     echo "  -i <input_vcf>         Input VCF (should be .gz and have .tbi index)."
-    echo "  -o <output_dir>        Output directory."
-    echo
-    echo "Optional arguments:"
-    echo "  -m <min_sv_length>    Filter out SVs smaller than set threshold. (default: 15)."
+    echo "  -o <output_dir>        Output directory for final vcf and temp files."
 
 }
 
@@ -21,14 +18,12 @@ if [ "$#" -eq 0 ]; then
     exit 1
 fi
 
-# Default values
-export MIN_SV_LENGTH=15
 
-while getopts "i:o:m:h" FLAG; do
+
+while getopts "i:o:h" FLAG; do
     case ${FLAG} in
         i) INPUTFILE=${OPTARG};;
         o) OUTDIR=${OPTARG};;
-        m) MIN_SV_LENGTH=${OPTARG};;
         h) 
             usage
             exit 0
@@ -42,6 +37,7 @@ while getopts "i:o:m:h" FLAG; do
 done
 
 ### modifiable variables
+export MIN_SV_LENGTH=15
 export OVERSIZED_THRESHOLD=100000
 export UW1KG_STRICTNESS="strict" ## strict or relaxed VCF
 ###
@@ -73,11 +69,10 @@ fi
 
 echo "Input file = ${INPUTFILE}"
 echo "Output directory = ${OUTDIR}"
-echo "Minimum SV Length = ${MIN_SV_LENGTH}"
 echo "Starting variant count: " $(zcat ${INPUTFILE} | grep -v '^#' | wc -l)
 
 echo '==' $(date) '==' Preprocess input VCF to filter for PASS and chr1-22,X,Y,M variants
-${BCFTOOLSCMD} bcftools view -f PASS -i "INFO/SVLEN>=${MIN_SV_LENGTH} || INFO/SVLEN<=-${MIN_SV_LENGTH}" \
+${BCFTOOLSCMD} bcftools view -f PASS \
 -r chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY,chrM \
 -Oz -o ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz ${INPUTFILE}
 ${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz
