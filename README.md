@@ -21,7 +21,7 @@ cd colorsDB-SV-workflow/
 
 ## Example run
 ```
-Usage: run_colors_workflow.sh -i <input_vcf> -o <output_dir> [-m <min_sv_length>]
+Usage: run_colors_workflow.sh -i <input_vcf> -o <output_dir>
 
 Required arguments:
   -i <input_vcf>         Input VCF (should be .gz and have .tbi index).

@@ -51,7 +51,7 @@ export COLORSDBVCF="${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jas
 export UWONTVCF="${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_${UW1KG_STRICTNESS}.setid.vcf.gz"
 
 export BCFTOOLSCMD="${COLORS_WORKFLOW_SINGULARITY}/bcftools_1.19.sif"
-export TRUVARICMD="${COLORS_WORKFLOW_SINGULARITY}/truvari_5.3.0.sif"
+export TRUVARICMD="/net/nwgc/vol1/home/czaka/tools/truvari/truvari_5.3.0_b9d94b6/bin/truvari"
 
 OUTDIR="${OUTDIR%/}"
 [ ! -d "${OUTDIR}" ] && mkdir "${OUTDIR}"
@@ -80,7 +80,7 @@ ${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.g
 echo "Remaining variant count: " $(zcat ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz | grep -v '^#' | wc -l)
 
 echo '==' $(date) '==' Truvari bench with ColorsDB 
-${TRUVARICMD} truvari bench -b ${COLORSDBVCF} -c ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_colors \
+${TRUVARICMD} bench -b ${COLORSDBVCF} -c ${OUTDIR}/debug/${PREFIX}.preprocessed.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_colors \
 --sizemin ${MIN_SV_LENGTH} --sizemax ${OVERSIZED_THRESHOLD} --dup-to-ins --write-resolved --refdist 500 --pctseq 0.90 --pctsize 0.90
 
 echo '==' $(date) '==' Append ColorsDB annotations 
@@ -95,7 +95,7 @@ ${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/debug/${PREFIX}.colorAnno.vcf.gz
 echo "Remaining variant count: " $(zcat ${OUTDIR}/debug/${PREFIX}.colorAnno.vcf.gz | grep -v '^#' | wc -l)
 
 echo '==' $(date) '==' Truvari bench with 1000gONT 
-${TRUVARICMD} truvari bench -b ${UWONTVCF} -c ${OUTDIR}/debug/${PREFIX}.colorAnno.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_1000g \
+${TRUVARICMD} bench -b ${UWONTVCF} -c ${OUTDIR}/debug/${PREFIX}.colorAnno.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_1000g \
 --sizemin ${MIN_SV_LENGTH} --sizemax ${OVERSIZED_THRESHOLD} --dup-to-ins --write-resolved --refdist 500 --pctseq 0.90 --pctsize 0.90
 
 echo '==' $(date) '==' Append 1000gONT annotations 
@@ -118,7 +118,7 @@ ${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/debug/${PREFIX}.oversizedSVs.vcf.g
 echo "Oversized SV count: " $(zcat ${OUTDIR}/debug/${PREFIX}.oversizedSVs.vcf.gz | grep -v '^#' | wc -l)
 
 echo '==' $(date) '==' OVERSIZED - Truvari bench with ColorsDB
-${TRUVARICMD} truvari bench -b ${COLORSDBVCF} -c ${OUTDIR}/debug/${PREFIX}.oversizedSVs.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_colors_oversized \
+${TRUVARICMD} bench -b ${COLORSDBVCF} -c ${OUTDIR}/debug/${PREFIX}.oversizedSVs.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_colors_oversized \
 --sizemin ${OVERSIZED_THRESHOLD} --sizemax -1 --dup-to-ins --refdist 500 --pctseq 0.90 --pctsize 0.90
 
 echo '==' $(date) '==' OVERSIZED - Append ColorsDB annotations 
@@ -131,7 +131,7 @@ ${BCFTOOLSCMD} bcftools sort ${OUTDIR}/debug/${PREFIX}.colorAnno.1000gAnno.withC
 ${BCFTOOLSCMD} bcftools index --tbi ${OUTDIR}/debug/${PREFIX}.colorAnno.1000gAnno.withColorsOversized.vcf.gz
 
 echo '==' $(date) '==' OVERSIZED - Truvari bench with 1000g
-${TRUVARICMD} truvari bench -b ${UWONTVCF} -c ${OUTDIR}/debug/${PREFIX}.colorAnno.1000gAnno.withColorsOversized.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_1000g_oversized \
+${TRUVARICMD} bench -b ${UWONTVCF} -c ${OUTDIR}/debug/${PREFIX}.colorAnno.1000gAnno.withColorsOversized.vcf.gz -f ${REF} -o ${OUTDIR}/debug/truvari_bench_1000g_oversized \
 --sizemin ${OVERSIZED_THRESHOLD} --sizemax -1 --dup-to-ins --refdist 500 --pctseq 0.90 --pctsize 0.90
 
 echo '==' $(date) '==' OVERSIZED - Append 1000g annotations 

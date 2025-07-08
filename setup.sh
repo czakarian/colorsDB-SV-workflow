@@ -35,9 +35,9 @@ echo $(date) - Downloading ColorsDB SV dataset to resources subfolder..
 curl -o ${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.vcf.gz https://zenodo.org/records/14814308/files/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.vcf.gz
 echo $(date) - End of download.
 
-echo $(date) - Formatting ColorsDB vcf by filling IDs and addding SAMPLE column.
+echo $(date) - Formatting ColorsDB vcf by filling IDs.
 ${BCFTOOLSCMD} bcftools annotate --set-id +'colors\_%CHROM\_%POS\_%INFO/SVTYPE\_%INFO/SVLEN' \
--Oz -o ${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.setid.vcf.gz ${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.vcf.gz
+-Oz -o ${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.setid.vcf.gz ${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.vcf.gz 
 ${BCFTOOLSCMD} bcftools index --tbi ${COLORS_WORKFLOW_RESOURCES}/CoLoRSdb.GRCh38.v1.2.0.pbsv.jasmine.setid.vcf.gz
 echo $(date) - End of ColorsDB VCF formatting.
 
@@ -46,13 +46,13 @@ curl -o ${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annot
 curl -o ${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_strict.vcf https://s3.amazonaws.com/1000g-ont/needLR/custom_analyses/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_strict.vcf
 echo $(date) - End of download.
 
-echo $(date) - Formatting strict 1000gONT vcf by filling IDs and addding SAMPLE column. 
+echo $(date) - Formatting strict 1000gONT vcf by filling IDs. 
 ${BCFTOOLSCMD} bcftools annotate --set-id +'1000gONT\_%CHROM\_%POS\_%INFO/SVTYPE\_%INFO/SVLEN' \
 -Oz -o ${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_strict.setid.vcf.gz ${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_strict.vcf 
 ${BCFTOOLSCMD} bcftools index --tbi ${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_strict.setid.vcf.gz
 echo $(date) - End of 1000gONT VCF formatting.
 
-echo $(date) - Formatting relaxed 1000gONT vcf by filling IDs and addding SAMPLE column. 
+echo $(date) - Formatting relaxed 1000gONT vcf by filling IDs. 
 ${BCFTOOLSCMD} bcftools annotate --set-id +'1000gONT\_%CHROM\_%POS\_%INFO/SVTYPE\_%INFO/SVLEN' \
 -Oz -o ${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_relaxed.setid.vcf.gz ${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_relaxed.vcf 
 ${BCFTOOLSCMD} bcftools index --tbi ${COLORS_WORKFLOW_RESOURCES}/UWONT_450_sniffles_2.5.2_cohort_merge_annotate_relaxed.setid.vcf.gz
